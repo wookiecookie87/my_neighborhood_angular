@@ -1,0 +1,41 @@
+.container {
+	width: 100vw;
+}
+
+.search-input {
+	height: 10vh;
+	background-color: #4c4c4c;
+	color: #fff;
+}
+
+.search-list {
+	height: 90vh;
+	background-color: #4c4c4c;
+	color: #fff;
+}
+
+.map {
+	height: 90vh;
+}
+
+.search-text {
+	margin-left: 30px;
+    background-color: #4c4c4c;
+    border: none;
+    height: 100%;
+    font-size: 7vh;
+    width: 60%;
+    outline: none;
+}
+
+.search-btn {
+  	margin-left: 30px;
+    height: 80%;
+    font-size: 5vh;
+    border: none;
+    border-radius: 5px;	
+    background: #237094;
+    vertical-align: super
+}
+
+/*AIzaSyBPyCSSYJRYMcIX5z6rnmH7AjLDl1UUu2Y*/
