@@ -1,3 +1,4 @@
+
 var searchList = [];
 
 var locations = [
@@ -69,20 +70,44 @@ var model = function(data){
 var viewModel = function(){
 	var self = this;
 	var list = $(".search-list ul");
+
+	var mapCanvas = document.getElementById('map');
+
+    var mapOptions = {
+      center: new google.maps.LatLng(37.5500, 126.9667),
+      zoom: 13,
+      mapTypeId: google.maps.MapTypeId.ROADMAP
+    }
+    var map = new google.maps.Map(mapCanvas, mapOptions);
+
+
+
 	this.searchText = ko.observable("");
 	this.locationList = ko.observableArray([]);
 
 	locations.forEach(function(location){
-		self.locationList().push(new model(location));
+		var Locations = new model(location);
+		var marker = new google.maps.Marker({
+			position : Locations.pos(),
+			map : map, 
+			title : Locations.locationName()
+		})
+		self.locationList().push(Locations);
 	});
+
+
+
 
 	this.filterList = function(){
 		var list = $(".search-list ul");
 		var filter = self.searchText();
 
-		$(list).find("li:not(:contains(" + filter + "))").hide();
+		var List = $(list).find("li:contains(" + filter + ")");
+		console.dir(List[1].innerText);
 
+		$(list).find("li:not(:contains(" + filter + "))").hide();
 		$(list).find("li:contains(" + filter + ")").show();
+
 	}
 
 }
