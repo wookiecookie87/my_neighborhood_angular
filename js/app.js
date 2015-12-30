@@ -1,6 +1,3 @@
-
-var searchList = [];
-
 var locations = [
 	{
 		name : "Home",
@@ -70,48 +67,122 @@ var model = function(data){
 var viewModel = function(){
 	var self = this;
 	var list = $(".search-list ul");
+	var map = null;
+	var markers = [];
+	var bubbles = [];
 
-	var mapCanvas = document.getElementById('map');
+	var client_id = "ACNAN1F1N3130P42NEXRRCNNJAVVBETYV2PKROURK32J3JKI";
+	var client_secret = "EH5EK1M2Q31IN31YE2ZX4GLRC55KXW14DLPAEDB1ZVOKROXB";
 
-    var mapOptions = {
-      center: new google.maps.LatLng(37.5500, 126.9667),
-      zoom: 13,
-      mapTypeId: google.maps.MapTypeId.ROADMAP
-    }
-    var map = new google.maps.Map(mapCanvas, mapOptions);
+	this.getInsta = function(lat, lng, place){
+		var instaUrl = "https://api.foursquare.com/v2/venues/explore?client_id="+client_id+"&client_secret="+client_secret+
+						"&ll="+lat+","+lng+"&v=20151231&radius=500&section=topPicks&limit=10";
+		var setData = "";
+		$.ajax({
+			type: "GET",
+			url : instaUrl,
+			cache : false,
+			dataType : "jsonp",
+			success : function(data){
+				$("#reco-table").empty();
+				var items = data.response.groups[0].items;
+				console.log(items);
+				setData += "<h5>Recommended Place near "+place+"</h5>";
+				setData += "<table>";
+				setData += "<th>Name of the Place</th><th>Address</th>";
+				
+				items.forEach(function(item){
+					setData += "	<tr>"
+					setData += "		<td>"+item.venue.name+"</td>"
+					setData += "		<td>"+item.venue.location.address+"</td>"
+					setData += "	</tr>"
+				});
+				setData += "	</table>";
+				$("#reco-table").append(setData);
+			}
+		});
 
+		
+	}
 
+	this.appInit = function(){
+		this.searchText = ko.observable("");
+		this.locationList = ko.observableArray([]);
+		locations.forEach(function(location){
+			var Locations = new model(location);
+			self.addMarker(Locations);
+			self.locationList().push(Locations);
+		});
+	}
 
-	this.searchText = ko.observable("");
-	this.locationList = ko.observableArray([]);
+	this.mapInit = function(){
+		var mapCanvas = document.getElementById('map');
+	    var mapOptions = {
+	      center: new google.maps.LatLng(37.580489, 127.004239),
+	      zoom: 13,
+	      mapTypeId: google.maps.MapTypeId.ROADMAP
+	    }
+	    map = new google.maps.Map(mapCanvas, mapOptions);
+	}
 
-	locations.forEach(function(location){
-		var Locations = new model(location);
+    this.clearMarkers = function(){
+		for(var i = 0; i < markers.length; i++){
+			markers[i].setMap(null);
+		}
+	}
+
+	this.addMarker = function(location){
+		var locationName = location.locationName();
+		var locationPosition = location.pos();
 		var marker = new google.maps.Marker({
-			position : Locations.pos(),
-			map : map, 
-			title : Locations.locationName()
+			position : locationPosition,
+			map:map,
+			title : locationName
 		})
-		self.locationList().push(Locations);
-	});
 
+		var lat = location.lat();
+		var lng = location.lng();
 
+		var bubble = self.addBubble(locationName);
+		
+		marker.addListener('click', function(){
+			self.getInsta(lat, lng, locationName);
+			bubble.close();
+			bubble.open(map, this);
+		})
 
+		markers.push(marker);
+	}
+
+	this.addBubble = function(title){
+		var contentString = '<div id="bubble-content"><h3>'+title+'</h3><div id="reco-table"></div></div>';
+		return new google.maps.InfoWindow({
+			content : contentString
+		})
+	}
 
 	this.filterList = function(){
+		self.clearMarkers();
 		var list = $(".search-list ul");
 		var filter = self.searchText();
 
 		var List = $(list).find("li:contains(" + filter + ")");
-		console.dir(List[1].innerText);
 
 		$(list).find("li:not(:contains(" + filter + "))").hide();
 		$(list).find("li:contains(" + filter + ")").show();
+		for(var i = 0; i < List.length; i++){
+			for(var j = 0; j < self.locationList().length; j++){
+				if(self.locationList()[j].locationName() == List[i].innerText){
+					self.addMarker(self.locationList()[j]);
+				}
 
+			}
+		}
 	}
 
+	this.mapInit();
+	this.appInit();
 }
 
 
 ko.applyBindings(new viewModel());
-
