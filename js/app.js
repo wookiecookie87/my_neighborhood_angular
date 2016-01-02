@@ -103,6 +103,9 @@ var viewModel = function(){
 				});
 				setData += "	</table>";
 				$("#reco-table").html(setData);
+			}, 
+			error : function(){
+				alert("error");
 			}
 
 		});
@@ -215,10 +218,12 @@ var viewModel = function(){
 			if(place.locationName() == marker.title){
 				clickedMarker = marker;
 				clickedMap = marker.map;
-				console.log(marker.title);
 			}
 		});
 		infoWindow.open(clickedMap, clickedMarker);
+		self.getInsta(clickedMarker.position.lat(), clickedMarker.position.lng(), place.locationName());
+		$("#reco-table").css("height", "120px");
+		$("#reco-table").css("overflow-y", "scroll");
 		//clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
 
 	}
