@@ -151,11 +151,7 @@ var viewModel = function(){
 			draggable : true
 		})
 
-		var contentString = '<div id="bubble-content"><h3>'+locationName+'</h3><div id="reco-table"></div></div>';
-		
-		infoWindow = new google.maps.InfoWindow({
-				content : contentString
-		});
+		infoWindow = self.addBubble(locationName);
 
 		marker.addListener("click", function(){
 			if (bounceTemp && bounceTemp.getAnimation() !== null) {
