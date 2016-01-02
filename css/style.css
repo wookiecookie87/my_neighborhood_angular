@@ -13,7 +13,7 @@
 	height: 94vh;
 	background-color: #4c4c4c;
 	color: #fff;
-
+    padding: 0;
 }
 
 .map {
@@ -37,13 +37,22 @@
     border: none;
     border-radius: 5px;	
     background: #237094;
-    vertical-align: super
+    vertical-align: super;
 }
 
 ul {
     margin: 0;
     padding: 0;
     list-style-type: none;
+}
+
+ul li {
+    padding: 10px 20px;
+    height: 40px;
+}
+
+ul li:hover {
+    background: gray;
 }
 
 /*AIzaSyBPyCSSYJRYMcIX5z6rnmH7AjLDl1UUu2Y*/

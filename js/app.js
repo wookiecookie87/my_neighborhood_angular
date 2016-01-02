@@ -68,8 +68,13 @@ var viewModel = function(){
 	var self = this;
 	var list = $(".search-list ul");
 	var map = null;
+	var marker = null;
 	var markers = [];
 	var bubbles = [];
+	var mapOptions = null;
+	var mapCanvas = null;
+	var infoWindow = null;
+	var bounceTemp = null;
 
 	var client_id = "ACNAN1F1N3130P42NEXRRCNNJAVVBETYV2PKROURK32J3JKI";
 	var client_secret = "EH5EK1M2Q31IN31YE2ZX4GLRC55KXW14DLPAEDB1ZVOKROXB";
@@ -84,7 +89,6 @@ var viewModel = function(){
 			cache : false,
 			dataType : "jsonp",
 			success : function(data){
-				$("#reco-table").empty();
 				var items = data.response.groups[0].items;
 				console.log(items);
 				setData += "<h5>Recommended Place near "+place+"</h5>";
@@ -98,8 +102,9 @@ var viewModel = function(){
 					setData += "	</tr>"
 				});
 				setData += "	</table>";
-				$("#reco-table").append(setData);
+				$("#reco-table").html(setData);
 			}
+
 		});
 
 		
@@ -110,14 +115,14 @@ var viewModel = function(){
 		this.locationList = ko.observableArray([]);
 		locations.forEach(function(location){
 			var Locations = new model(location);
-			self.addMarker(Locations);
+			self.createMarker(Locations);
 			self.locationList().push(Locations);
 		});
 	}
 
 	this.mapInit = function(){
-		var mapCanvas = document.getElementById('map');
-	    var mapOptions = {
+		mapCanvas = document.getElementById('map');
+	   	mapOptions = {
 	      center: new google.maps.LatLng(37.580489, 127.004239),
 	      zoom: 13,
 	      mapTypeId: google.maps.MapTypeId.ROADMAP
@@ -131,27 +136,54 @@ var viewModel = function(){
 		}
 	}
 
-	this.addMarker = function(location){
+	this.createMarker = function(location){
 		var locationName = location.locationName();
 		var locationPosition = location.pos();
-		var marker = new google.maps.Marker({
-			position : locationPosition,
-			map:map,
-			title : locationName
-		})
-
 		var lat = location.lat();
 		var lng = location.lng();
-
-		var bubble = self.addBubble(locationName);
 		
-		marker.addListener('click', function(){
+
+		marker = new google.maps.Marker({
+			position : locationPosition,
+			map:map,
+			title : locationName,
+			animation: google.maps.Animation.DROP,
+			draggable : true
+		})
+
+		var contentString = '<div id="bubble-content"><h3>'+locationName+'</h3><div id="reco-table"></div></div>';
+		
+		infoWindow = new google.maps.InfoWindow({
+				content : contentString
+		});
+
+		marker.addListener("click", function(){
+			if (bounceTemp && bounceTemp.getAnimation() !== null) {
+				bounceTemp.setAnimation(null);
+				this.setAnimation(google.maps.Animation.BOUNCE);
+				bounceTemp = this;
+			} else {
+				this.setAnimation(google.maps.Animation.BOUNCE);
+				bounceTemp = this;
+			}
+
+			if(infoWindow)infoWindow.close();
+			map.setCenter(marker.getPosition());
+			infoWindow.open(map, this);
 			self.getInsta(lat, lng, locationName);
-			bubble.close();
-			bubble.open(map, this);
+			$("#reco-table").css("height", "120px");
+			$("#reco-table").css("overflow-y", "scroll");
 		})
 
 		markers.push(marker);
+	}
+
+	this.toggleBounce = function(marker) {
+		if (marker.getAnimation() !== null) {
+			marker.setAnimation(null);
+		} else {
+			marker.setAnimation(google.maps.Animation.BOUNCE);
+		}
 	}
 
 	this.addBubble = function(title){
@@ -178,6 +210,21 @@ var viewModel = function(){
 
 			}
 		}
+	}
+
+	this.showLocation = function(place){
+		var clickedMarker = null;
+		var clickedMap = null;
+		markers.forEach(function(marker){
+			if(place.locationName() == marker.title){
+				clickedMarker = marker;
+				clickedMap = marker.map;
+				console.log(marker.title);
+			}
+		});
+		infoWindow.open(clickedMap, clickedMarker);
+		//clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
+
 	}
 
 	this.mapInit();
