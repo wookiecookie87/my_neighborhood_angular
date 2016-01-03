@@ -62,6 +62,7 @@ var model = function(data){
 	this.pos = ko.observable(data.pos);
 	this.lat = ko.observable(data.pos.lat);
 	this.lng = ko.observable(data.pos.lng);
+	this.filter = ko.observable(true);
 }
 
 var viewModel = function(){
@@ -83,6 +84,11 @@ var viewModel = function(){
 		var instaUrl = "https://api.foursquare.com/v2/venues/explore?client_id="+client_id+"&client_secret="+client_secret+
 						"&ll="+lat+","+lng+"&v=20151231&radius=500&section=topPicks&limit=10";
 		var setData = "";
+
+		var instaRequestTimeout = setTimeout(function(){
+			alert("failed to get the resources");
+		}, 10000);
+
 		$.ajax({
 			type: "GET",
 			url : instaUrl,
@@ -103,9 +109,8 @@ var viewModel = function(){
 				});
 				setData += "	</table>";
 				$("#reco-table").html(setData);
-			}, 
-			error : function(){
-				alert("error");
+
+				clearTimeout(instaRequestTimeout);
 			}
 
 		});
@@ -191,24 +196,20 @@ var viewModel = function(){
 			content : contentString
 		})
 	}
-
+	
 	this.filterList = function(){
+		var list = self.locationList();
+		var len = self.locationList().length
+		var filterText = self.searchText();
 		self.clearMarkers();
-		var list = $(".search-list ul");
-		var filter = self.searchText();
-
-		var List = $(list).find("li:contains(" + filter + ")");
-
-		$(list).find("li:not(:contains(" + filter + "))").hide();
-		$(list).find("li:contains(" + filter + ")").show();
-		for(var i = 0; i < List.length; i++){
-			for(var j = 0; j < self.locationList().length; j++){
-				if(self.locationList()[j].locationName() == List[i].innerText){
-					self.addMarker(self.locationList()[j]);
+			for(var i = 0; i < len; i++){
+				if(list[i].locationName().toLowerCase().indexOf(filterText.toLowerCase()) < 0){
+					list[i].filter(false)
+				}else{
+					list[i].filter(true);
+					self.createMarker(list[i])
 				}
-
 			}
-		}
 	}
 
 	this.showLocation = function(place){
