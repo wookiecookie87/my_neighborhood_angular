@@ -16,12 +16,12 @@
 					<input type="text" class="search-text" placeholder="Enter search text"data-bind='value:searchText, valueUpdate: "afterkeydown", event:{keyup: filterList}' />
 				</div>
 			</form>	
-			<div class="col-xs-4 col-lg-2 search-list">
+			<div class="col-xs-3 col-lg-2 search-list">
 				<ul data-bind="foreach:locationList">
 					<li data-bind="text: locationName, click: $parent.showLocation, visible:filter"></li>
 				</ul>
 			</div>
-			<div class="col-xs-8 col-lg-10 map" id="map"></div>
+			<div class="col-xs-9 col-lg-10 map" id="map"></div>
 		</div>
 	</div>	
 </body>

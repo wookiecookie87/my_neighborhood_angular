@@ -97,6 +97,7 @@ var viewModel = function(){
 			success : function(data){
 				var items = data.response.groups[0].items;
 				console.log(items);
+				setData += '<div id="bubble-content"><h3>'+place+'</h3><div style="height: 120px" id="reco-table">';
 				setData += "<h5>Recommended Place near "+place+"</h5>";
 				setData += "<table>";
 				setData += "<th>Name of the Place</th><th>Address</th>";
@@ -108,13 +109,18 @@ var viewModel = function(){
 					setData += "	</tr>"
 				});
 				setData += "	</table>";
-				$("#reco-table").html(setData);
+				setData += "    </div></div>"
+				//$("#reco-table").html(setData);
+				$("#reco-table").css("height", "120px");
+				$("#reco-table").css("overflow-y", "scroll");
+				infoWindow.setContent(setData)
 
 				clearTimeout(instaRequestTimeout);
 			}
 
 		});
 
+		return infoWindow
 		
 	}
 
@@ -132,7 +138,7 @@ var viewModel = function(){
 		mapCanvas = document.getElementById('map');
 	   	mapOptions = {
 	      center: new google.maps.LatLng(37.580489, 127.004239),
-	      zoom: 13,
+	      zoom: 12,
 	      mapTypeId: google.maps.MapTypeId.ROADMAP
 	    }
 	    map = new google.maps.Map(mapCanvas, mapOptions);
@@ -159,7 +165,7 @@ var viewModel = function(){
 			draggable : true
 		})
 
-		infoWindow = self.addBubble(locationName);
+		infoWindow = new google.maps.InfoWindow();
 
 		marker.addListener("click", function(){
 			if (bounceTemp && bounceTemp.getAnimation() !== null) {
@@ -173,10 +179,9 @@ var viewModel = function(){
 
 			if(infoWindow)infoWindow.close();
 			map.setCenter(marker.getPosition());
-			infoWindow.open(map, this);
 			self.getInsta(lat, lng, locationName);
-			$("#reco-table").css("height", "120px");
-			$("#reco-table").css("overflow-y", "scroll");
+			
+			infoWindow.open(map, this);
 		})
 
 		markers.push(marker);

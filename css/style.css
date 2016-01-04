@@ -55,4 +55,10 @@ ul li:hover {
     background: gray;
 }
 
-/*AIzaSyBPyCSSYJRYMcIX5z6rnmH7AjLDl1UUu2Y*/
+@media only screen and (max-width: 320px){
+    ul li {
+        padding: 10px 0;
+        height: 50px;
+        fons-size: 12px;
+    }
+}
