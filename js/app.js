@@ -87,7 +87,7 @@ var viewModel = function(){
 
 		var instaRequestTimeout = setTimeout(function(){
 			alert("failed to get the resources");
-		}, 10000);
+		}, 3000);
 
 		$.ajax({
 			type: "GET",

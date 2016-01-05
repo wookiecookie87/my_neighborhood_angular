@@ -55,10 +55,11 @@ ul li:hover {
     background: gray;
 }
 
-@media only screen and (max-width: 320px){
+@media only screen and (min-width: 200px) and (max-width: 750px){
     ul li {
         padding: 10px 0;
         height: 50px;
-        fons-size: 12px;
+        font-size: 12px;
+        word-break: break-word;
     }
 }
