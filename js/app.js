@@ -55,7 +55,7 @@ var locations = [
 			lng : 126.975995
 		}	
 	},
-]
+];
 
 var model = function(data){
 	this.locationName = ko.observable(data.name);
@@ -63,7 +63,7 @@ var model = function(data){
 	this.lat = ko.observable(data.pos.lat);
 	this.lng = ko.observable(data.pos.lng);
 	this.filter = ko.observable(true);
-}
+};
 
 var viewModel = function(){
 	var self = this;
@@ -71,7 +71,7 @@ var viewModel = function(){
 	var map = null;
 	var marker = null;
 	var markers = [];
-	var bubbles = [];
+
 	var mapOptions = null;
 	var mapCanvas = null;
 	var infoWindow = null;
@@ -86,8 +86,8 @@ var viewModel = function(){
 		var setData = "";
 
 		var instaRequestTimeout = setTimeout(function(){
-			alert("failed to get the resources");
-		}, 3000);
+			alert("Udable to load data");
+		}, 2000);
 
 		$.ajax({
 			type: "GET",
@@ -96,33 +96,32 @@ var viewModel = function(){
 			dataType : "jsonp",
 			success : function(data){
 				var items = data.response.groups[0].items;
-				console.log(items);
 				setData += '<div id="bubble-content"><h3>'+place+'</h3><div style="height: 120px" id="reco-table">';
 				setData += "<h5>Recommended Place near "+place+"</h5>";
 				setData += "<table>";
 				setData += "<th>Name of the Place</th><th>Address</th>";
 				
 				items.forEach(function(item){
-					setData += "	<tr>"
-					setData += "		<td>"+item.venue.name+"</td>"
-					setData += "		<td>"+item.venue.location.address+"</td>"
-					setData += "	</tr>"
+					setData += "	<tr>";
+					setData += "		<td>"+item.venue.name+"</td>";
+					setData += "		<td>"+item.venue.location.address+"</td>";
+					setData += "	</tr>";
 				});
 				setData += "	</table>";
-				setData += "    </div></div>"
+				setData += "    </div></div>";
 				//$("#reco-table").html(setData);
 				$("#reco-table").css("height", "120px");
 				$("#reco-table").css("overflow-y", "scroll");
-				infoWindow.setContent(setData)
+				infoWindow.setContent(setData);
 
 				clearTimeout(instaRequestTimeout);
 			}
 
 		});
 
-		return infoWindow
+		return infoWindow;
 		
-	}
+	};
 
 	this.appInit = function(){
 		this.searchText = ko.observable("");
@@ -132,7 +131,7 @@ var viewModel = function(){
 			self.createMarker(Locations);
 			self.locationList().push(Locations);
 		});
-	}
+	};
 
 	this.mapInit = function(){
 		mapCanvas = document.getElementById('map');
@@ -140,15 +139,15 @@ var viewModel = function(){
 	      center: new google.maps.LatLng(37.580489, 127.004239),
 	      zoom: 12,
 	      mapTypeId: google.maps.MapTypeId.ROADMAP
-	    }
+	    };
 	    map = new google.maps.Map(mapCanvas, mapOptions);
-	}
+	};
 
     this.clearMarkers = function(){
 		for(var i = 0; i < markers.length; i++){
 			markers[i].setMap(null);
 		}
-	}
+	};
 
 	this.createMarker = function(location){
 		var locationName = location.locationName();
@@ -163,7 +162,7 @@ var viewModel = function(){
 			title : locationName,
 			animation: google.maps.Animation.DROP,
 			draggable : true
-		})
+		});
 
 		infoWindow = new google.maps.InfoWindow();
 
@@ -182,40 +181,26 @@ var viewModel = function(){
 			self.getInsta(lat, lng, locationName);
 			
 			infoWindow.open(map, this);
-		})
+		});
 
 		markers.push(marker);
-	}
+	};
 
-	this.toggleBounce = function(marker) {
-		if (marker.getAnimation() !== null) {
-			marker.setAnimation(null);
-		} else {
-			marker.setAnimation(google.maps.Animation.BOUNCE);
-		}
-	}
-
-	this.addBubble = function(title){
-		var contentString = '<div id="bubble-content"><h3>'+title+'</h3><div id="reco-table"></div></div>';
-		return new google.maps.InfoWindow({
-			content : contentString
-		})
-	}
 	
 	this.filterList = function(){
 		var list = self.locationList();
-		var len = self.locationList().length
+		var len = self.locationList().length;
 		var filterText = self.searchText();
 		self.clearMarkers();
 			for(var i = 0; i < len; i++){
 				if(list[i].locationName().toLowerCase().indexOf(filterText.toLowerCase()) < 0){
-					list[i].filter(false)
+					list[i].filter(false);
 				}else{
 					list[i].filter(true);
-					self.createMarker(list[i])
+					self.createMarker(list[i]);
 				}
 			}
-	}
+	};
 
 	this.showLocation = function(place){
 		var clickedMarker = null;
@@ -230,13 +215,12 @@ var viewModel = function(){
 		self.getInsta(clickedMarker.position.lat(), clickedMarker.position.lng(), place.locationName());
 		$("#reco-table").css("height", "120px");
 		$("#reco-table").css("overflow-y", "scroll");
-		//clickedMarker.setAnimation(google.maps.Animation.BOUNCE);
 
-	}
+	};
 
 	this.mapInit();
 	this.appInit();
-}
+};
 
 
 
